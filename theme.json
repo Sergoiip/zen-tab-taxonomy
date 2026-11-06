@@ -1,0 +1,32 @@
+{
+  "id": "tab-taxonomy",
+  "name": "Tab Taxonomy",
+  "description": "Precise AI tidy for your tabs. It first designs a taxonomy for the Space (named categories with a clear scope), then sorts every tab into collapsible, colored sections below the pinned line, like Arc's Tidy Tabs. Free Groq engine with local fallbacks. English & Spanish.",
+  "homepage": "https://github.com/Sergoiip/zen-tab-taxonomy",
+  "readme": "https://raw.githubusercontent.com/Sergoiip/zen-tab-taxonomy/main/README.md",
+  "image": "https://raw.githubusercontent.com/Sergoiip/zen-tab-taxonomy/main/assets/screenshot.png",
+  "author": "Sergio Marcucci · CogniLab",
+  "version": "1.0.0",
+  "ai": "yes",
+  "supportsUnload": false,
+  "scripts": {
+    "tab-taxonomy.uc.js": {
+      "include": [
+        "chrome://browser/content/browser.xhtml"
+      ]
+    }
+  },
+  "preferences": "preferences.json",
+  "tags": [
+    "Tabs",
+    "AI",
+    "Productivity",
+    "Organization",
+    "Arc"
+  ],
+  "createdAt": "2026-11-06",
+  "updatedAt": "2026-11-06",
+  "fork": [
+    "zen"
+  ]
+}

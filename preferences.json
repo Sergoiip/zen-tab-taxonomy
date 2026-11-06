@@ -1,0 +1,119 @@
+[
+  {
+    "type": "text",
+    "label": "**Engine: Groq (free).** Get a key at console.groq.com/keys and paste it below. Only tab *titles and domains* are sent, never page content. Without a key, Zen's local AI is used.",
+    "size": "13px"
+  },
+  {
+    "type": "string",
+    "property": "tabtaxonomy.groq-key",
+    "label": "Groq API key",
+    "defaultValue": "",
+    "placeholder": "gsk_…"
+  },
+  {
+    "type": "string",
+    "property": "tabtaxonomy.env-file",
+    "label": "…or read GROQ_API_KEY from this file (optional)",
+    "defaultValue": "",
+    "placeholder": "~/.config/groq.env"
+  },
+  {
+    "type": "dropdown",
+    "property": "tabtaxonomy.model",
+    "label": "Model",
+    "defaultValue": "openai/gpt-oss-120b",
+    "options": [
+      {
+        "label": "gpt-oss-120b (most precise)",
+        "value": "openai/gpt-oss-120b"
+      },
+      {
+        "label": "gpt-oss-20b (faster)",
+        "value": "openai/gpt-oss-20b"
+      },
+      {
+        "label": "Qwen 3.8 27B",
+        "value": "qwen/qwen3.8-27b"
+      }
+    ]
+  },
+  {
+    "type": "dropdown",
+    "property": "tabtaxonomy.language",
+    "label": "Language (UI and category names)",
+    "defaultValue": "auto",
+    "options": [
+      {
+        "label": "Same as the browser",
+        "value": "auto"
+      },
+      {
+        "label": "English",
+        "value": "en"
+      },
+      {
+        "label": "Español",
+        "value": "es"
+      }
+    ]
+  },
+  {
+    "type": "separator"
+  },
+  {
+    "type": "checkbox",
+    "property": "tabtaxonomy.local-fallback",
+    "label": "If Groq fails, use Zen's local AI (downloads ~60 MB the first time)",
+    "defaultValue": true
+  },
+  {
+    "type": "checkbox",
+    "property": "tabtaxonomy.suggest-spaces",
+    "label": "Suggest moving a category to another Space (“→ Space” chip on its header)",
+    "defaultValue": true
+  },
+  {
+    "type": "dropdown",
+    "property": "tabtaxonomy.position",
+    "label": "Where categories go",
+    "defaultValue": "below",
+    "options": [
+      {
+        "label": "Below new tabs",
+        "value": "below"
+      },
+      {
+        "label": "Right under the pinned line",
+        "value": "above"
+      }
+    ]
+  },
+  {
+    "type": "dropdown",
+    "property": "tabtaxonomy.max-categories",
+    "label": "Max categories per tidy",
+    "defaultValue": "8",
+    "options": [
+      {
+        "label": "5",
+        "value": "5"
+      },
+      {
+        "label": "8",
+        "value": "8"
+      },
+      {
+        "label": "10",
+        "value": "10"
+      }
+    ]
+  },
+  {
+    "type": "string",
+    "property": "tabtaxonomy.shortcut",
+    "label": "Keyboard shortcut",
+    "defaultValue": "ctrl+alt+o",
+    "placeholder": "ctrl+alt+o"
+  }
+]
