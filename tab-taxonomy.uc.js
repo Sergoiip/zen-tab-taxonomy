@@ -112,6 +112,7 @@
       restored: "Orden anterior restaurado",
       cancelled: "Ordenado cancelado",
       allSorted: "Todo está ordenado ✓",
+      noneFit: n => `${n} pestañas no encajan en ninguna categoría: quedan sueltas`,
       result: (n, c, e) => `${n} pestañas en ${c} categorías · ${e}`,
       unsorted: n => ` · ${n} sin clasificar`,
       undoHint: "Clic derecho en una categoría → Deshacer último orden",
@@ -174,6 +175,7 @@
       restored: "Previous order restored",
       cancelled: "Tidy cancelled",
       allSorted: "Everything is tidy ✓",
+      noneFit: n => `${n} tabs don't fit any category: left loose`,
       result: (n, c, e) => `${n} tabs in ${c} categories · ${e}`,
       unsorted: n => ` · ${n} left unsorted`,
       undoHint: "Right-click a category → Undo last tidy",
@@ -1151,6 +1153,10 @@
       }
       apply(spaceId, result, all, existing);
       const n = result.categories.reduce((a, c) => a + c.tabs.length, 0);
+      if (!n) {
+        toast(tr("noneFit", result.missing), notes.join(" | "));
+        return;
+      }
       let msg = tr("result", n, result.categories.length, result.engine);
       if (result.missing > 0) {
         msg += tr("unsorted", result.missing);
@@ -1274,9 +1280,29 @@
     }
   }
 
+  // Elementos con texto traducible: se re-etiquetan si cambia el idioma.
+  const labeled = [];
+  function labelKey(el, key) {
+    el.setAttribute("label", tr(key));
+    labeled.push([el, key]);
+  }
+  function relabel() {
+    for (const [el, key] of labeled) {
+      el.setAttribute("label", tr(key));
+    }
+    for (const b of document.querySelectorAll(".tt-tidy-button")) {
+      b.setAttribute("label", tr("button"));
+      b.setAttribute("tooltiptext", tr("buttonTip", prettyShortcut()));
+    }
+  }
+
   function menuItem(label, fn, id) {
     const m = document.createXULElement("menuitem");
-    m.setAttribute("label", label);
+    if (Object.hasOwn(STRINGS.en, label)) {
+      labelKey(m, label);
+    } else {
+      m.setAttribute("label", label);
+    }
     if (id) {
       m.id = id;
     }
@@ -1290,27 +1316,27 @@
     popup.id = "tt-tidy-header-menu";
     const header = () => popup.triggerNode?.closest?.(".tt-tidy-header");
     const moveMenu = document.createXULElement("menu");
-    moveMenu.setAttribute("label", tr("moveCatToSpace"));
+    labelKey(moveMenu, "moveCatToSpace");
     const movePopup = document.createXULElement("menupopup");
     moveMenu.append(movePopup);
     popup.append(
-      menuItem(tr("rename"), () => header() && renameCat(header())),
-      menuItem(tr("up"), () => header() && moveCatInList(header(), -1)),
-      menuItem(tr("down"), () => header() && moveCatInList(header(), 1)),
+      menuItem("rename", () => header() && renameCat(header())),
+      menuItem("up", () => header() && moveCatInList(header(), -1)),
+      menuItem("down", () => header() && moveCatInList(header(), 1)),
       moveMenu,
       document.createXULElement("menuseparator"),
-      menuItem(tr("ungroup"), () => header() && ungroupCat(header())),
-      menuItem(tr("unload"), () => {
+      menuItem("ungroup", () => header() && ungroupCat(header())),
+      menuItem("unload", () => {
         const h = header();
         if (h) {
           gBrowser.explicitUnloadTabs(tabsOfHeader(h).filter(t => !t.hasAttribute("pending")));
         }
       }),
-      menuItem(tr("closeTabs"), () => header() && closeCat(header())),
+      menuItem("closeTabs", () => header() && closeCat(header())),
       document.createXULElement("menuseparator"),
-      menuItem(tr("sortNew"), () => tidy()),
-      menuItem(tr("resortAll"), () => tidy({ all: true })),
-      menuItem(tr("undo"), doUndo)
+      menuItem("sortNew", () => tidy()),
+      menuItem("resortAll", () => tidy({ all: true })),
+      menuItem("undo", doUndo)
     );
     popup.addEventListener("popupshowing", e => {
       if (e.target !== popup) {
@@ -1330,14 +1356,14 @@
     const tabMenu = document.getElementById("tabContextMenu");
     const sep = document.createXULElement("menuseparator");
     sep.id = "tt-tidy-sep";
-    const itemTidy = menuItem(tr("sortAI"), () => tidy(), "tt-tidy-ctx-tidy");
-    const itemAll = menuItem(tr("resortAll"), () => tidy({ all: true }), "tt-tidy-ctx-all");
+    const itemTidy = menuItem("sortAI", () => tidy(), "tt-tidy-ctx-tidy");
+    const itemAll = menuItem("resortAll", () => tidy({ all: true }), "tt-tidy-ctx-all");
     const catMenu = document.createXULElement("menu");
     catMenu.id = "tt-tidy-ctx-cat";
-    catMenu.setAttribute("label", tr("moveToCat"));
+    labelKey(catMenu, "moveToCat");
     const catPopup = document.createXULElement("menupopup");
     catMenu.append(catPopup);
-    const itemUndo = menuItem(tr("undo"), doUndo, "tt-tidy-ctx-undo");
+    const itemUndo = menuItem("undo", doUndo, "tt-tidy-ctx-undo");
     tabMenu.append(sep, itemTidy, itemAll, catMenu, itemUndo);
     tabMenu.addEventListener("popupshowing", e => {
       if (e.target !== tabMenu) {
@@ -1367,7 +1393,7 @@
       });
       items.push(document.createXULElement("menuseparator"));
       items.push(
-        menuItem(tr("newCat"), () => {
+        menuItem("newCat", () => {
           const v = { value: "" };
           if (Services.prompt.prompt(window, tr("newCatTitle"), tr("newCatMsg"), v, null, {}) && v.value.trim()) {
             const name = v.value.trim();
@@ -1383,7 +1409,7 @@
       );
       if (current) {
         items.push(
-          menuItem(tr("removeFromCat"), () => {
+          menuItem("removeFromCat", () => {
             selected.forEach(t => setCatOf(t, null));
             schedule();
           })
@@ -1397,8 +1423,8 @@
     if (wsMenu) {
       wsMenu.append(
         document.createXULElement("menuseparator"),
-        menuItem(tr("sortAI"), () => tidy(), "tt-tidy-ws-tidy"),
-        menuItem(tr("resortAll"), () => tidy({ all: true }), "tt-tidy-ws-all")
+        menuItem("sortAI", () => tidy(), "tt-tidy-ws-tidy"),
+        menuItem("resortAll", () => tidy({ all: true }), "tt-tidy-ws-all")
       );
     }
   }
@@ -1610,6 +1636,9 @@
     const prefObserver = { observe: schedule };
     Services.prefs.addObserver(P.position, prefObserver);
     Services.prefs.addObserver(P.suggestSpaces, prefObserver);
+    const langObserver = { observe: () => { relabel(); schedule(); } };
+    Services.prefs.addObserver(P.language, langObserver);
+    window.addEventListener("unload", () => Services.prefs.removeObserver(P.language, langObserver));
     window.addEventListener("unload", () => {
       Services.prefs.removeObserver(P.position, prefObserver);
       Services.prefs.removeObserver(P.suggestSpaces, prefObserver);
